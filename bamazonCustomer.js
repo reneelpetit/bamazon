@@ -1,10 +1,12 @@
 // ## Challenge #1: Customer View (Minimum Requirement)
 //this is dotenv for storing API keys
-const result = require('dotenv').config("./bamazon.env");
+const result = require('dotenv').config({ path: "C:/users/renee/bamazon/bamazon/bamazon.env" });
 //keys set up
 var keys = require("./keys");
 
 var fs = require('fs');
+var Database = require('dotenv');
+var databasePW = new Database(keys.databasePW);
 // 1. Create a MySQL Database called `bamazon`.
 
 // 2. Then create a Table inside of that database called `products`.
@@ -33,7 +35,7 @@ var connection = mysql.createConnection({
     // Your username
     user: "root",
     // Your password
-    password: "",
+    password: databasePW,
     database: "bamazon"
 });
 connection.connect(function (err) {
@@ -49,7 +51,7 @@ function readDatabase() {
             console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
                 res[i].price + " | " + res[i].stock_quantity + " | ");
         }
-        runInquirer();
+        //runInquirer();
     })
 }
 
@@ -58,15 +60,15 @@ function readDatabase() {
 
 //    * The first should ask them the ID of the product they would like to buy.
 //    * The second message should ask how many units of the product they would like to buy.
-function runInquirer() {
-    inquirer.prompt({
-        name: "searchSong",
-        type: "input",
-        message: "What song are you searching for?",
-    })
-        .then(function (answer) {
-        }
-}
+// function runInquirer() {
+//     inquirer.prompt({
+//         name: "searchSong",
+//         type: "input",
+//         message: "What song are you searching for?",
+//     })
+//         .then(function (answer) {
+//         }
+// }
 // 7. Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
 
 //    * If not, the app should log a phrase like `Insufficient quantity!`, and then prevent the order from going through.
