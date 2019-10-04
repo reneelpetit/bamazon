@@ -19,6 +19,7 @@
   "homepage": "https://github.com/reneelpetit/bamazon#readme",
   "dependencies": {
     "dotenv": "^8.1.0",
-    "inquirer": "^7.0.0"
+    "inquirer": "^7.0.0",
+    "mysql": "^2.17.1"
   }
 }

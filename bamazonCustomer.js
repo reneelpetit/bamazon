@@ -1,12 +1,9 @@
 // ## Challenge #1: Customer View (Minimum Requirement)
 //this is dotenv for storing API keys
-const result = require('dotenv').config({ path: "C:/users/renee/bamazon/bamazon/bamazon.env" });
-//keys set up
-var keys = require("./keys");
+require('dotenv').config();
 
 var fs = require('fs');
-var Database = require('dotenv');
-var databasePW = new Database(keys.databasePW);
+
 // 1. Create a MySQL Database called `bamazon`.
 
 // 2. Then create a Table inside of that database called `products`.
@@ -35,7 +32,7 @@ var connection = mysql.createConnection({
     // Your username
     user: "root",
     // Your password
-    password: databasePW,
+    password: process.env.DATABASE_PW,
     database: "bamazon"
 });
 connection.connect(function (err) {
