@@ -25,6 +25,7 @@ var fs = require('fs');
 // 5. Then create a Node application called `bamazonCustomer.js`. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+
 var connection = mysql.createConnection({
     host: "localhost",
     // Your port; if not 3306
@@ -38,7 +39,7 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    readDatabase();
+    firstPrompt();
 })
 
 function readDatabase() {
@@ -48,38 +49,85 @@ function readDatabase() {
             console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
                 res[i].price + " | " + res[i].stock_quantity + " | ");
         }
-        askID();
-    })
+        askUser();
+    });
 }
 
+function firstPrompt() {
+    inquirer.prompt([
+        {
+            name: "buyOrQuit",
+            type: "list",
+            message: "Welcome to bamazon! Would you like to [PURCHASE] or [QUIT]?",
+            choices: ["PURCHASE", "QUIT"]
+        }
+    ]).then(function (answer) {
+        if (answer.buyOrQuit === "QUIT") {
+            connection.end();
+        }
+        else {
+            readDatabase();
+        }
+    });
+}
 
 // 6. The app should then prompt users with two messages.
 
 //    * The first should ask them the ID of the product they would like to buy.
 //    * The second message should ask how many units of the product they would like to buy.
-function askID() {
-    inquirer.prompt(
+function askUser() {
+    inquirer.prompt([
         {
-        name: "userChoice2BuyID",
-        type: "input",
-        message: "Type the ID of the product you wish to buy."
-    }
-    )
+            name: "itemID",
+            type: "message",
+            message: "Type the ID of an item you wish to purchase: "
+        },
+        {
+            name: "itemQuantity",
+            type: "message",
+            message: "How many do you want to buy? "
+        }
+    ])
         .then(function (answer) {
-            console.log(answer);
-            askQuantity();
+            compareQuantity(answer.itemID, answer.itemQuantity);
+        })
+}
+
+function compareQuantity(item, quantity) {
+    connection.query("SELECT * FROM products WHERE ?", {
+        item_id: item
+    },
+        function (err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            var databaseQuantity = res[0].stock_quantity;
+            var totalPrice = res[0].price * quantity;
+            if (databaseQuantity >= quantity) {
+                console.log("OK, looks like we have that in stock. \n For " + quantity + " " + res[0].product_name + " at $" + res[0].price + " each, \n that will be a total of $ " + totalPrice);
+                var newQuantity = databaseQuantity - quantity;
+                updateDatabase(newQuantity, res[0].item_id);
+            }
+            else {
+                console.log("Oh no, we're sorry, we only have " + res[0].stock_quantity + " in stock.");
+                firstPrompt();
+            }
         });
 }
-function askQuantity() {
-    inquirer.prompt(
-    {
-    name: "userChoice2BuyQuantity",
-    type: "input",
-    message: "How many do you want to purchase?"
-})
-.then(function (answer) {
-    console.log(answer);
-});
+
+function updateDatabase(quantity, id) {
+connection.query(
+    "UPDATE products SET ? WHERE ?",
+    [
+        {
+            stock_quantity: quantity
+        },
+        {
+            item_id: id
+        }
+    ], function (err, res) {
+        if (err) throw err;
+        firstPrompt();
+    })
 }
 // 7. Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
 
