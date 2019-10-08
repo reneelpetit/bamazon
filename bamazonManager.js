@@ -67,21 +67,78 @@ function menuPrompt() {
 }
 
 function viewProducts() {
-    console.log("viewProducts");
-    menuPrompt();
+    console.log("You've selected view all products");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
+                res[i].price + " | " + res[i].stock_quantity + " | ");
+        }
+        menuPrompt();
+    });  
 // * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
 }
 
 function viewLowInventory() {
-    console.log("viewLowInventory");
-    menuPrompt();
+    console.log("You've selected view all low inventory");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            if (res[i].stock_quantity < 5) {
+            console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
+                res[i].price + " | " + res[i].stock_quantity + " | ");
+            }
+        }
+        menuPrompt();
+    }); 
 // * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
 }
 
 function addInventory() {
-    console.log("add inventory");
-    menuPrompt();
+    console.log("You've selected add to inventory");
+    inquirer.prompt([
+        {
+            name: "itemID",
+            type: "message",
+            message: "Type the ID of the item you wish to select: "
+        },
+        {
+            name: "itemQuantity",
+            type: "message",
+            message: "Type many you want to add to the inventory: "
+        }
+    ])
+        .then(function (answer) {
+            addItemInventory(answer.itemID, answer.itemQuantity);
+        })
 // * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+}
+
+function addItemInventory(id, quantity) {
+    connection.query ("SELECT * FROM products WHERE ?", {
+            item_id: id
+        }, function (err, res) {
+            if (err) throw err;
+            var newInventoryAmount = res[0].stock_quantity + parseInt(quantity, 10);
+            updateInventoryAmount(res[0].item_id, newInventoryAmount);
+        })
+}
+
+function updateInventoryAmount(id, amount) {
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock_quantity: amount
+            },
+            {
+                item_id: id
+            }
+        ], function (err, res) {
+            if (err) throw err;
+            console.log("Inventory updated. New quantity: " + amount);
+            menuPrompt();
+        })
 }
 
 function addProduct() {
