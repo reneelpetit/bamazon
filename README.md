@@ -3,7 +3,9 @@
 This application has a customer view and a manager view.
 
 In the customer view, users can select to PURCHASE or QUIT.
+
 ![Customer view, first prompt](https://github.com/reneelpetit/bamazon/blob/master/screenshots/customerViewFirstPrompt.JPG) 
+
 If they select purchase, then are then prompted to select which item and how much they wish to purchase. If there is sufficient quantity in stock, they are told the total cost of the item and the directed back to menu.
 ![Customer view, purchase item](https://github.com/reneelpetit/bamazon/blob/master/screenshots/customerViewPurchasePrompts.JPG) 
 If there is not sufficient quantity in stock they are told how much inventory there is of the item and directed back to menu. 
