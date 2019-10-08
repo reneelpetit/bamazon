@@ -75,8 +75,8 @@ function viewProducts() {
                 res[i].price + " | " + res[i].stock_quantity + " | ");
         }
         menuPrompt();
-    });  
-// * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
+    });
+    // * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
 }
 
 function viewLowInventory() {
@@ -85,13 +85,13 @@ function viewLowInventory() {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
             if (res[i].stock_quantity < 5) {
-            console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
-                res[i].price + " | " + res[i].stock_quantity + " | ");
+                console.log("Items: \n" + " | " + res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " +
+                    res[i].price + " | " + res[i].stock_quantity + " | ");
             }
         }
         menuPrompt();
-    }); 
-// * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
+    });
+    // * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
 }
 
 function addInventory() {
@@ -111,17 +111,17 @@ function addInventory() {
         .then(function (answer) {
             addItemInventory(answer.itemID, answer.itemQuantity);
         })
-// * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+    // * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
 }
 
 function addItemInventory(id, quantity) {
-    connection.query ("SELECT * FROM products WHERE ?", {
-            item_id: id
-        }, function (err, res) {
-            if (err) throw err;
-            var newInventoryAmount = res[0].stock_quantity + parseInt(quantity, 10);
-            updateInventoryAmount(res[0].item_id, newInventoryAmount);
-        })
+    connection.query("SELECT * FROM products WHERE ?", {
+        item_id: id
+    }, function (err, res) {
+        if (err) throw err;
+        var newInventoryAmount = res[0].stock_quantity + parseInt(quantity, 10);
+        updateInventoryAmount(res[0].item_id, newInventoryAmount);
+    })
 }
 
 function updateInventoryAmount(id, amount) {
@@ -142,9 +142,48 @@ function updateInventoryAmount(id, amount) {
 }
 
 function addProduct() {
-    console.log("addProduct");
-    menuPrompt();
-// * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
+    console.log("You've selected add new product");
+    inquirer.prompt([
+        {
+            name: "productName",
+            type: "message",
+            message: "Type the name of the product you wish to add: "
+        },
+        {
+            name: "departmentName",
+            type: "message",
+            message: "Type the name of the department this item belongs to: "
+        },
+        {
+            name: "price",
+            type: "message",
+            message: "Type the price of the item per each item: "
+        },
+        {
+            name: "stockQuantity",
+            type: "message",
+            message: "Type how many items you're adding: "
+        }
+    ]).then(function (answer) {
+        var itemName = answer.productName;
+        var itemDepartment = answer.departmentName;
+        var itemPrice = answer.price;
+        var itemQuantity = answer.stockQuantity;
+        connection.query(
+            "INSERT INTO products SET ?",
+            {
+                product_name: itemName,
+                department_name: itemDepartment,
+                price: itemPrice,
+                stock_quantity: itemQuantity
+            },
+            function (err, res) {
+                if (err) throw err;
+                console.log("New item added!\n");
+                menuPrompt();
+            });
+        // * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
+    });
 }
 // - - -
 
